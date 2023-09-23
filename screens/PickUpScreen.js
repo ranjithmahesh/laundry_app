@@ -58,7 +58,7 @@ const PickUpScreen = () => {
       time: "1:00 PM",
     },
     {
-      id: "3",
+      id: "2",
       time: "2:00 PM",
     },
     {

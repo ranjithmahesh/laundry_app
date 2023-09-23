@@ -17,6 +17,8 @@ import Carousel from "../components/Carousel";
 import Services from "../components/Services";
 import { getProducts } from "../ProductReducer";
 import { useNavigation } from "@react-navigation/native";
+import { collection, getDoc, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 
 const HomeScreen = () => {
   const cart = useSelector((state) => state.cart.cart);
@@ -25,6 +27,7 @@ const HomeScreen = () => {
     .reduce((curr, prev) => curr + prev, 0);
 
   const navigation = useNavigation();
+  const [items, setItems] = useState([]);
 
   const [displayCurrentAdress, setDisplayCurrentAdress] = useState(
     "we are loading your location"
@@ -94,11 +97,18 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (product.length > 0) return;
-    const fetchProducts = () => {
-      services.map((service) => dispatch(getProducts(service)));
+    const fetchProducts = async () => {
+      const colRef = collection(db, "types");
+      const docsSnap = await getDocs(colRef);
+      docsSnap.forEach((doc) => {
+        items.push(doc.data());
+      });
+
+      items.map((servie) => dispatch(getProducts(servie)));
     };
     fetchProducts();
   }, []);
+  // console.log(product);
 
   const services = [
     {
@@ -168,7 +178,10 @@ const HomeScreen = () => {
             <Text style={{ fontSize: 18, fontWeigth: "600" }}>Home</Text>
             <Text>{displayCurrentAdress}</Text>
           </View>
-          <Pressable style={{ marginLeft: "auto", marginRight: 15 }}>
+          <Pressable
+            onPress={() => navigation.navigate("Profile")}
+            style={{ marginLeft: "auto", marginRight: 15 }}
+          >
             <Image
               style={{ width: 40, height: 40, borderRadius: 20 }}
               source={{
